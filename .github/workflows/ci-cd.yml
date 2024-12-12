@@ -1,17 +1,26 @@
-name: Super-Linter
+name: streamlit app ci
 
-on: push
+on: [push]
 
 jobs:
-  super-lint:
-    name: Lint code base
+  build-and-test:
     runs-on: ubuntu-latest
-    steps: 
-      - name: Chekout code
+    
+    strategy: 
+      matrix:
+        node-version: [14.x, 16.x]
+        
+      steps:
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js ${{ matrix.node-version}}
         uses: actions/checkout@v2
-
-      - name: Run Super-Linter
-        uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          node-version: ${{ matrix.node-version}}
+          
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./fleetmanagementclient
+      - name: Run tests
+        run: npm test
+        working-directory: ./fleetmanagementclient 
